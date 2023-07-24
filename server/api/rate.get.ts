@@ -1,7 +1,8 @@
 import Redis from 'ioredis'
 import { getRedisKey } from '../../utils'
+import { H3Event } from 'h3'
 
-export default defineEventHandler(async function (event): Promise<unknown> {
+export default defineEventHandler(async function (event: H3Event): Promise<unknown> {
   const redis: Redis = new Redis(process.env.REDIS_URL as string)
   const { uid } = getQuery(event)
   const redisKey = getRedisKey(uid as string)

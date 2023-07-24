@@ -27,7 +27,6 @@
     <div class="col-span-2 alert alert-error" v-if="message">
       <p>{{ message }}</p>
     </div>
-    <nuxt-link to="/ranks">ranks</nuxt-link>
   </div>
 </template>
 
@@ -53,7 +52,7 @@ const currentRate = computed<CurrentRate>(() => {
   let rate = 0
   for (let i = 1, len = 5; i <= len; i++) {
     const key = ('r' + i) as keyof RateData
-    const value = rateData.value ? rateData.value[key] : 0
+    const value = rateData.value ? rateData.value[key as keyof typeof rateData.value] : 0
     if (!value) {
       continue
     }
@@ -71,7 +70,7 @@ const rate = computed<number>(() => {
 })
 
 onMounted(() => {
-  console.log(process.env);
+  console.log(process.env)
   const stored = localStorage.getItem(LOCAL_KEY)
   if (stored) {
     voted = JSON.parse(stored)
@@ -95,10 +94,10 @@ const onChange: (event: Event | false) => Promise<void> = async (event: Event | 
 
   const key = ('r' + myRate.value) as keyof RateData
   const oldRate = voted[path] || 0
-  rateData.value && (rateData.value[key] += 1)
+  rateData.value && ((rateData.value[key as keyof typeof rateData.value] as number) -= 1)
   if (oldRate) {
     const key = ('r' + myRate.value) as keyof RateData
-    rateData.value && (rateData.value[key] -= 1)
+    rateData.value && ((rateData.value[key as keyof typeof rateData.value] as number) -= 1)
   }
   voted[path] = myRate.value
   localStorage.setItem(LOCAL_KEY, JSON.stringify(voted))
