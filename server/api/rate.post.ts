@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis'
-import { getHour, getRedisKey } from '../../utils'
+import { getHour, getRedisKey, createNewRating } from '../../utils'
 import { RateData } from '../../types'
 
 export default defineEventHandler(async function (event): Promise<unknown> {
@@ -9,7 +9,7 @@ export default defineEventHandler(async function (event): Promise<unknown> {
   let data
   try {
     const stored = await redis.get(redisKey)
-    data = stored ? JSON.parse(stored) : {}
+    data = stored ? JSON.parse(stored) : createNewRating()
   } catch (error) {
     throw createError({
       statusCode: 400,
@@ -24,7 +24,7 @@ export default defineEventHandler(async function (event): Promise<unknown> {
     data[key] -= 1
   }
   const hour = getHour(Date.now())
-  const stored = JSON.parse(data)
+  const stored = JSON.stringify(data)
   await Promise.all([redis.set(redisKey, stored), redis.set(`${body.uid}_${hour}`, stored, 'EX', 86400 * 30)])
   redis.quit()
   return data
